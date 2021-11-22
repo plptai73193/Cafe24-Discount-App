@@ -31,6 +31,8 @@ class ProductService {
          
       ];
 
+
+      //Validate field
       $require_field = [
          "mall_id",
          "shop_no",
@@ -56,12 +58,15 @@ class ProductService {
       $time = $params["time"];
       $discount_percent = 30;
 
+
+      // Get mall token
       $select = [
          "id",
          "cafe_mall_id",
          "access_token",
          "refresh_token",
       ];
+
 
       $where = [
          "cafe_mall_id" => $ec_mall_id
@@ -77,6 +82,9 @@ class ProductService {
          foreach ($cart_products as $cart_product) {
             $cart_product_nos[] = $cart_product['product_no'];
          }
+
+
+
          // Get Product ID from healthy-juice category
          $endpoint_products = "products";
          $cf_params = [
@@ -154,13 +162,15 @@ class ProductService {
                   ];
                }
                $response_data["product_discount"] = $temp;
+
+               // parse HMAC based on $response_data["product_discount"]
                $response_data["hmac"] = base64_encode(hash_hmac('sha256', json_encode($response_data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), $this->client_secret , true));
                $result['code'] = 200;
                $result['message'] = "OK";
                $result['data'] = $response_data;
             
             } else {
-               $result['message'] = "There is less then 3 discounted product in cart";
+               $result['message'] = "There is less then 3 discounted products in cart";
             }
             $discount_api_log = [
                "mall_id" => $mall_id,
