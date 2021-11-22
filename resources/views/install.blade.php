@@ -1,5 +1,8 @@
 <?php
 use App\Libs\Cafe24\Cafe24Token;
+use App\Models\Mall;
+
+
 
 $client_id = (env('APP_ENV') == "production") ? env('CAFE24_APP_CLIENT_ID') : env('CAFE24_APP_CLIENT_ID_DEV');
 $client_secret = (env('APP_ENV') == "production") ? env('CAFE24_APP_CLIENT_SECRET') : env('CAFE24_APP_CLIENT_SECRET_DEV');
@@ -83,42 +86,50 @@ if (!empty($tokenData->error)) {
         } else {
             $all_shops = $response_curl;
             $response_curl = json_decode($response_curl, true);
-            
+            // dd($all_shops);
             if ($response_curl["success"] == false) {
                 echo $response_curl["msg"];
             } else {
                 $msg = $response_curl["msg"];
                 $datas = $response_curl["data"];
-                $shop = $datas["mall"];
+                $shops = $datas["mall"];
                 $logs = $datas["logs"];
+                
 
-                foreach ($datas as $shop) {
-                    $shop_no = $shop['shop_no'];
-                    $scripttag_params = [
-                        "cafe_mall_id" => $cafe_mall_id,
-                        "shop_no" => $shop_no,
-                    ];
-                    // install CAFE24API
-                    $curl = curl_init();
-                    curl_setopt_array($curl, array(
-                        CURLOPT_URL => "{$app_url}/api/v1/mall/cafe24api",
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_CUSTOMREQUEST => "POST",
-                        CURLOPT_SSL_VERIFYPEER => false,
-                        CURLOPT_POSTFIELDS => $scripttag_params,
-                    ));
-                    $response_curl = curl_exec($curl);
-                    $err_curl = curl_error($curl);
-                    curl_close($curl);
-                }
-                ?>
-                <?php if ($response_curl["success"] === false) {
-                    $error_msg = $msg;
-                    echo $error_msg;
-                } else {
-                    $cafe_mall_id = $shop["cafe_mall_id"];
-                    $mall_id = $shop["id"];
-                    echo "{$cafe_mall_id} - {$mall_id}";
+                $select = [
+                    "id",
+                    "cafe_mall_id",
+                    "shop_no",
+                    "access_token",
+                    "refresh_token",
+                ];
+
+                $where = [
+                    "cafe_mall_id" => $shops['cafe_mall_id'],
+            ];
+
+                $malls = Mall::select($select)->where($where)->get()->toArray();
+                if (!empty($malls)) {
+                    foreach ($malls as $mall) {
+                        $shop_no = $mall['shop_no'];
+                        $scripttag_params = [
+                            "cafe_mall_id" => $cafe_mall_id,
+                            "shop_no" => $shop_no,
+                        ];
+                        // install CAFE24API
+                        $curl = curl_init();
+                        curl_setopt_array($curl, array(
+                            CURLOPT_URL => "{$app_url}/api/v1/mall/cafe24api",
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_CUSTOMREQUEST => "POST",
+                            CURLOPT_SSL_VERIFYPEER => false,
+                            CURLOPT_POSTFIELDS => $scripttag_params,
+                        ));
+                        $response_curl = curl_exec($curl);
+                        $err_curl = curl_error($curl);
+                        curl_close($curl);
+                    }
+                    echo "<h1>Discount App Installed</h1>";
                 }
             }
             // if ($all_shops["success"] === true && !empty($all_shops["data"])) {
