@@ -34,7 +34,7 @@ class ProductService {
 
       //Validate field
       $require_field = [
-         "mall_id",
+         // "mall_id",
          "shop_no",
          "member_id",
          "time",
