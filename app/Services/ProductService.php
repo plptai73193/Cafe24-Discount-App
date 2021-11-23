@@ -79,10 +79,17 @@ class ProductService {
 
 
       if (!empty($cart_products)) {
+         // Get Product ID from cart
          foreach ($cart_products as $cart_product) {
-            $cart_product_nos[] = $cart_product['product_no'];
+            $cart_product_quantity = $cart_product['quantity'];
+            if ($cart_product_quantity > 1) {
+               for ($i = 1; $i <= $cart_product_quantity; $i++) {
+                  $cart_product_nos[] = $cart_product['product_no'];
+               }
+            } else {
+               $cart_product_nos[] = $cart_product['product_no'];
+            }
          }
-
 
 
          // Get Product ID from healthy-juice category
@@ -170,7 +177,7 @@ class ProductService {
                $result['data'] = $response_data;
             
             } else {
-               $result['message'] = "There is less then 3 discounted products in cart";
+               $result['message'] = "There is less than 3 discounted products in cart";
                $response_data = [];
             }
             $discount_api_log = [
