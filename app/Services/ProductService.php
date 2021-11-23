@@ -164,7 +164,7 @@ class ProductService {
                $response_data["product_discount"] = $temp;
 
                // parse HMAC based on $response_data["product_discount"]
-               $response_data["hmac"] = base64_encode(hash_hmac('sha256', base64_encode(json_encode($response_data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES)), $this->client_secret , true));
+               $response_data["hmac"] = base64_encode(hash_hmac('sha256', json_encode($response_data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), $this->client_secret , true));
                $result['code'] = 200;
                $result['message'] = "OK";
                $result['data'] = $response_data;
