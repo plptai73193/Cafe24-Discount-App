@@ -171,6 +171,7 @@ class ProductService {
             
             } else {
                $result['message'] = "There is less then 3 discounted products in cart";
+               $response_data = [];
             }
             $discount_api_log = [
                "mall_id" => $mall_id,
